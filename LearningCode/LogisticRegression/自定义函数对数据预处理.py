@@ -42,7 +42,7 @@ def data_preprocess(data):
     result = pd.concat([x,y],axis=1)
     return result
 
-pd_data = pd.read_csv(r"../dataset/LogiReg_data.txt", header=None, names=['Exam 1', 'Exam 2', 'Admitted'])
+pd_data = pd.read_csv(r"C:\Users\tianx\PycharmProjects\analysistest\dataset\LogiReg_data.txt", header=None, names=['Exam 1', 'Exam 2', 'Admitted'])
 
 data =pd_data.iloc[:,:-1]
 target = pd_data.iloc[:,-1]

@@ -1,12 +1,9 @@
+"""数据预处理并保存到 CSV 文件"""
+
 import re
 
-from sklearn.datasets import load_iris,make_blobs
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 from sklearn.svm import SVR
-from sklearn.utils import shuffle
-from sklearn.linear_model import LogisticRegression
 
 # 读取数据
 gender_submission = pd.read_csv(r"../../dataset/titanic/gender_submission.csv")
@@ -96,14 +93,24 @@ train_test_Age_isna_predict = svr.predict(train_test_Age_isna.drop(["Age","Name"
 
 # 将预测出的年龄填充上去.
 train_test_Age_isna.loc[:,"Age"] = train_test_Age_isna_predict
+# print(train_test_Age_isna)
 
-print(train_test_Age_notna.shape)
+
 
 # 合并 train_test_Age_isna, train_test_Age_notna 数据
+train_test_2 = train_test_Age_isna.append(train_test_Age_notna)
 
 # 提取 Survived != 2 的数据为训练数据, Survived == 2 的数据为测试数据.
+train_test_2_train = train_test_2.loc[(train_test_2.loc[:,"Survived"] != 2)]
+train_test_2_test = train_test_2.loc[(train_test_2.loc[:,"Survived"] == 2)]
 
 
+keys = gender_submission.loc[:,"PassengerId"]
+values = gender_submission.loc[:,"Survived"]
+map_dict = dict(zip(keys,values))
 
+train_test_2_test.loc[:,"Survived"] = train_test_2_test.loc[:,"PassengerId"].map(map_dict)
 
-
+# 保存 train_test_2_train, train_test_2_test 到本地.
+train_test_2_train.to_csv(path_or_buf=r"C:\Users\tianx\PycharmProjects\analysistest\dataset\titanic\train_data.csv",index=False)
+train_test_2_test.to_csv(path_or_buf=r"C:\Users\tianx\PycharmProjects\analysistest\dataset\titanic\test_data.csv",index=False)
