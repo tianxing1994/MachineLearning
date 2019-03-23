@@ -6,9 +6,9 @@ import pandas as pd
 from sklearn.svm import SVR
 
 # 读取数据
-gender_submission = pd.read_csv(r"../../dataset/titanic/gender_submission.csv")
-test_origin = pd.read_csv(r"../../dataset/titanic/test.csv")
-train_origin = pd.read_csv(r"../../dataset/titanic/train.csv")
+gender_submission = pd.read_csv(r"C:\Users\tianx\PycharmProjects\analysistest\dataset\titanic\gender_submission.csv")
+test_origin = pd.read_csv(r"C:\Users\tianx\PycharmProjects\analysistest\dataset\titanic\test.csv")
+train_origin = pd.read_csv(r"C:\Users\tianx\PycharmProjects\analysistest\dataset\titanic\train.csv")
 
 # 字段解释
 # PassengerId: 乘客 ID
