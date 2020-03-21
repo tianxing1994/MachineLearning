@@ -1,4 +1,5 @@
 """
+参考链接:
 https://blog.csdn.net/slx_share/article/details/80097020
 
 https://github.com/Shi-Lixin/Machine-Learning-Algorithms
@@ -69,7 +70,7 @@ class MaxEntry(object):
 
     def py_x(self, x):
         """
-        跟据先验, 计算当前 x 属于各类别 y 的概率.
+        计算 x 发生时, y 发生的概率.
         :param x:
         :return:
         """
@@ -80,6 +81,7 @@ class MaxEntry(object):
                 key = (i, value, y)
                 if key in self._feature_list:
                     s += self._w[self._feature_list.index(key)]
+            # 由于 s 的最从 0 开始迭代, 所以一开始值很小时出现值无效, 除以 0 等问题. 所以映射成 e^{x}.
             py_x[y] = math.exp(s)
         normalizer = sum(py_x.values())
         for k, v in py_x.items():
@@ -100,28 +102,14 @@ class MaxEntry(object):
         estimate_feature = self.estimate_feature(x_data, y_data)
         delta = np.zeros(self._n_feature)
         for j in range(self._n_feature):
-            delta[j] = 1 / self._m * math.log(
-                self._expect_feature[self._feature_list[j]] / estimate_feature[self._feature_list[j]]
-            )
-            # try:
-            #     delta[j] = 1 / self._m * math.log(
-            #         self._expect_feature[self._feature_list[j]] / estimate_feature[self._feature_list[j]]
-            #     )
-            # except:
-            #     continue
+            try:
+                delta[j] = 1 / self._m * math.log(
+                    self._expect_feature[self._feature_list[j]] / estimate_feature[self._feature_list[j]]
+                )
+            except:
+                # 在训练集中所有的 (i, value, y) 特征一定都可以索引得到, 但对没有见过的测试集, 则索引可能报错.
+                continue
         delta = delta / delta.sum()
-        return delta
-
-    def iis(self, delta, x_data, y_data):
-        g = np.zeros(self._n_feature)
-        g_diff = np.zeros(self._n_feature)
-        for j in range(self._n_feature):
-            for k in range(self._n):
-                x = tuple(x_data[k])
-                g[j] += self._px[x] * self.py_x(x)[y_data[k]] * math.exp(delta[j] * self._m[k])
-                g_diff[j] += g[j] * self._m[k]
-            g[j] -= self._expect_feature[j]
-            delta[j] -= g[j] / g_diff[j]
         return delta
 
     def fit(self, x_data, y_data):
