@@ -66,7 +66,7 @@ STOP_COST = 1
 STOP_GRAD = 2
 
 
-def stop_criterion(value,stop_type=0, threshold=100):
+def stop_criterion(value,stop_type=0, threshold=100.):
     """设定三种不同的停止策略"""
     if stop_type == STOP_ITER:
         return value >= threshold
