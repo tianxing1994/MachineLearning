@@ -10,6 +10,7 @@ X_{t} = Z_{t} + \phi_{1} Z_{t-1} + \phi_{2} Z_{t-2} + \phi_{3} Z_{t-3} + \cdots 
 from collections import deque
 import random
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def white_noise(mu=0, sigma=1):
@@ -43,6 +44,71 @@ def moving_average_p(phi_list):
         x += z
         history_z_list.append(z)
         yield x
+
+
+def check_phi1(phi_list):
+    # 方法可能不正确.
+    # X_{t} = \phi_{1} X_{t-1} + \phi_{2} X_{t-2} + \phi_{3} X_{t-3} + \cdots + \phi_{k} X_{t-k} + Z_{t}
+    # 判断一组 phi 值用于生成时间序列时, 是否会收使敛.
+    # 如果结果图像收敛到 0, 则 phi 可用.
+
+    m_n = len(phi_list)
+    f = np.eye(m_n, m_n, -1, dtype=np.float64)
+    f[0] = np.array(phi_list, dtype=np.float64)
+    print(f)
+
+    eigvalue, eigvector = np.linalg.eig(f)
+    print(eigvalue)
+
+    p = len(eigvalue)
+    c_denominator = list()
+    for i in range(p):
+        c_denominator_temp = 1
+        for j in range(p):
+            if i == j:
+                continue
+            c_denominator_temp *= (eigvalue[i] - eigvalue[j])
+        c_denominator.append(c_denominator_temp)
+
+    c = list()
+    for i in range(p):
+        c_temp = eigvalue[i] ** (p - 1) / c_denominator[i]
+        c.append(c_temp)
+
+    c = np.array(c, dtype=np.complex)
+
+    f11 = list()
+    for i in range(100):
+        lambda_j = np.power(eigvalue, i + 1)
+        f11_j = np.dot(c, lambda_j).astype('float64')
+        f11.append(f11_j)
+
+    plt.plot(f11)
+    plt.show()
+    return
+
+
+def check_phi2(phi_list):
+    # 方法可能不正确.
+    m_n = len(phi_list)
+    f = np.eye(m_n, m_n, -1, dtype=np.float64)
+    f[0] = np.array(phi_list, dtype=np.float64)
+    print(f)
+
+    def f_j(f_matrix, j):
+        ret = f_matrix
+        for i in range(j):
+            ret = np.dot(ret, ret)
+        return ret
+
+    f11 = list()
+    for j in range(100):
+        f11_j = f_j(f, j)[0, 0]
+        f11.append(f11_j)
+
+    plt.plot(f11)
+    plt.show()
+    return
 
 
 def demo1():
@@ -107,8 +173,17 @@ def demo4():
     return
 
 
+def demo5():
+    # phi_list = [0.9, 0.7, 0.5, 0.3, 0.1]
+    phi_list = [1, -0.8]
+    check_phi1(phi_list)
+    # check_phi2(phi_list)
+    return
+
+
 if __name__ == '__main__':
     # demo1()
     # demo2()
     # demo3()
-    demo4()
+    # demo4()
+    demo5()
